@@ -1,41 +1,32 @@
-// var http = require('http');
+import express from 'express';
+import bodyParser from 'body-Parser'
+import { createLogger, format, transports } from 'winston';
+import { hostname } from 'os';
 
-// var server = http.createServer(function(req, res) {
-//     res.writeHead(200, { "Content-type": "text/plain" });
-//     res.end("Hello world\n");
-// });
+const app = express();
 
-
-// server.listen(3000, function() {
-//     console.log('connected on 3000');
-// });
-
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
-var winston = require('winston');
-
+const hostName = '0.0.0.0';
 const port = 3000;
 
 const router = express.Router();
 
-router.get('/', function(req, res) {
-    res.json({ message: 'hello from get!' });   
+router.get('/', function (req, res) {
+    res.json({ message: 'hello from get!' });
 });
 
-router.get('/person', function(req, res) {
-    res.json({ message: 'Hi! from get from person' });   
+router.get('/person', function (req, res) {
+    res.json({ message: 'Hi! from get from person' });
 });
 
-router.post('/', function(req, res) {
-    res.json({ message: 'hello from post!' });   
+router.post('/', function (req, res) {
+    res.json({ message: 'hello from post!' });
 })
 
-router.put('/', function(req, res) {
-    res.json({ message: 'hello from put!' });   
+router.put('/', function (req, res) {
+    res.json({ message: 'hello from put!' });
 })
 const logFileName = 'info.log';
 const errorLogFileName = 'error.log';
@@ -69,22 +60,23 @@ const options = {
     },
 };
 
-const logFormat = winston.format.printf(({ level, message, label, timestamp }) => {
+const logFormat = format.printf(({ level, message, label, timestamp }) => {
     return `${timestamp} [${level}]: ${message}`;
 });
 
-const logger = new winston.createLogger({
-    format: winston.format.combine(winston.format.timestamp(), logFormat),
+const logger = new createLogger({
+    format: format.combine(format.timestamp(), logFormat),
     transports: [
-        new winston.transports.File(options.info),
-        new winston.transports.File(options.error),
-        new winston.transports.Console(options.console)
+        new transports.File(options.info),
+        new transports.File(options.error),
+        new transports.Console(options.console)
     ],
     exitOnError: false, // do not exit on handled exceptions
 });
 
+
+
 app.use('/api', router);
-logger.info('Server started on port ' + port + ' ...');
-logger.error('test');
+logger.info(`API started on http://${hostName}:${port}/api/`);
 // app.use(logger);
-app.listen(port);
+app.listen(port, hostname);
