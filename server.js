@@ -4,7 +4,6 @@ import { createLogger, format, transports } from 'winston';
 import { hostname } from 'os';
 
 const app = express();
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
@@ -28,6 +27,7 @@ router.post('/', function (req, res) {
 router.put('/', function (req, res) {
     res.json({ message: 'hello from put!' });
 })
+
 const logFileName = 'info.log';
 const errorLogFileName = 'error.log';
 
@@ -73,8 +73,6 @@ const logger = new createLogger({
     ],
     exitOnError: false, // do not exit on handled exceptions
 });
-
-
 
 app.use('/api', router);
 logger.info(`API started on http://${hostName}:${port}/api/`);
