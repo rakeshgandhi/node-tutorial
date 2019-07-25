@@ -1,14 +1,15 @@
 import express from 'express';
 import bodyParser from 'body-Parser'
 import { createLogger, format, transports } from 'winston';
-import { hostname } from 'os';
+import mongoose from 'mongoose';
+import config from './config';
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
-const hostName = '0.0.0.0';
-const port = 3000;
+const host = '0.0.0.0';
+
 
 const router = express.Router();
 
@@ -21,6 +22,8 @@ router.get('/person', function (req, res) {
 });
 
 router.post('/', function (req, res) {
+    const kitty = new Cat({ name: 'Zildjian' });
+    kitty.save().then(() => console.log('meow'));
     res.json({ message: 'hello from post!' });
 })
 
@@ -74,7 +77,10 @@ const logger = new createLogger({
     exitOnError: false, // do not exit on handled exceptions
 });
 
+mongoose.connect('mongodb://localhost:27017/test', { useNewUrlParser: true });
+const Cat = mongoose.model('Cat', { name: String });
+
 app.use('/api', router);
-logger.info(`API started on http://${hostName}:${port}/api/`);
 // app.use(logger);
-app.listen(port, hostname);
+app.listen(config.port);
+logger.info(`API started on http://${host}:${config.port}/api/`);
